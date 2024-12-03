@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: mahaharbor.com/maha/myapp:5
+        ports:
+        - containerPort: 5000
+      imagePullSecrets:
+      - name: harbor-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-deployment
+spec:
+  selector:
+    app: myapp  # Update with the label of your deployment/pod
+  ports:
+    - protocol: TCP
+      port: 8080        # The LoadBalancer will expose this port
+      targetPort: 5000   # The container is listening on port 5000
+  type: LoadBalancer   # This creates an external LoadBalancer (on supported cloud providers)
+---
